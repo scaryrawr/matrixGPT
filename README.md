@@ -1,4 +1,4 @@
-# Matrix
+# MatrixGPT
 
 These are some scripts to interact with [OpenAI's APIs](https://platform.openai.com/docs/api-reference). Inspired by ["become a 1000x engineer or die tryin'](https://kadekillary.work/posts/1000x-eng/). With scripts named after characters from the Matrix.
 
