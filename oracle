@@ -1,0 +1,57 @@
+#! /usr/bin/env fish
+
+set -g message_cache "$TMPDIR/oracle.cache"
+
+function help
+    echo 'Usage: oracle [options]'
+    echo '  -h, --help'
+    echo '      Prints this help message'
+    echo '  -m, --message'
+    echo '      Sets the message to send'
+    echo '  -s, --system'
+    echo '      Sets the system prompt'
+    echo '  -c, --clear'
+    echo '      Clears the message cache'
+    exit
+end
+
+function clear_cache
+    rm -f $message_cache
+    exit 0
+end
+
+argparse h/help 'm/message=' 's/system=' c/clear -- $argv
+
+if test $_flag_help
+    help
+end
+
+if test $_flag_clear
+    clear_cache
+end
+
+set token (security find-generic-password -a $USER -s OpenAI -w)
+set request '{ "model": "gpt-3.5-turbo", "messages": [] }'
+
+if test -f $message_cache
+    set messages (jq -n ". += $(cat $message_cache)")
+else
+    set messages "[]"
+end
+
+set messages (echo $messages | jq --arg message "$_flag_message" '. += [{ "role": "user", "content": $message }]')
+
+if test $_flag_system
+    set request (echo $request | jq --arg system "$_flag_system" '.messages += [{ "role": "system", "content": $system }]')
+end
+
+set request (echo $request | jq ".messages += $messages")
+
+set response (curl -s -X POST https://api.openai.com/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $token" \
+    -d "$request" | jq -r '.choices[0].message')
+
+set messages (echo $messages | jq ". += [$response]")
+echo $response | jq -r '.content'
+echo $messages | jq -c '.[-10:]' >$message_cache
