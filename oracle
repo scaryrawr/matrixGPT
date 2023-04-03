@@ -50,7 +50,7 @@ set request (echo $request | jq ".messages += $messages")
 set response (curl -s -X POST https://api.openai.com/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $token" \
-    -d "$request" | jq -r '.choices[0].message')
+    -d "$request" | jq '.choices[0].message')
 
 set messages (echo $messages | jq ". += [$response]")
 echo $response | jq -r '.content'
