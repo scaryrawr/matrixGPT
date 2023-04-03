@@ -1,9 +1,8 @@
 #! /usr/bin/env fish
 
-argparse h/help 'i/instruction=' 'f/file=' -- $argv
+argparse 'i/instruction=' 'f/file=' -- $argv
 
 set token (security find-generic-password -a $USER -s OpenAI -w)
-set request '{ "model": "code-davinci-edit-001" }'
 
 if test $_flag_file
     set input (cat $_flag_file | string collect -N)
@@ -11,11 +10,9 @@ else
     read -z input
 end
 
-set request (echo $request | jq -c --arg input "$input" --arg instruction "$_flag_instruction" '.input = $input | .instruction = $instruction')
+set request (jq -n -c --arg input "$input" --arg instruction "$_flag_instruction" '.model = "code-davinci-edit-001" | .input = $input | .instruction = $instruction')
 
-set response_blob (curl -s -X POST https://api.openai.com/v1/edits \
+curl -s -X POST https://api.openai.com/v1/edits \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $token" \
-    -d "$request")
-
-echo $response_blob | jq -r '.choices[0].text'
+    -d "$request" | jq -r '.choices[0].text'

@@ -34,7 +34,7 @@ set token (security find-generic-password -a $USER -s OpenAI -w)
 set request '{ "model": "gpt-3.5-turbo", "messages": [] }'
 
 if test -f $message_cache
-    set messages (jq -n ". += $(cat $message_cache)")
+    set messages (jq -n ". = $(cat $message_cache)")
 else
     set messages "[]"
 end
