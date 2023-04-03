@@ -51,7 +51,7 @@ oracle -m 'How about in C?'
 > int main() {
 >    int i; // declare a variable to use as the counter
 >
->    for (i = 1; i >= 10; i++) {
+>    for (i = 1; i <= 10; i++) {
 >        printf("%d\n", i); // print the current value of i
 >    }
 >
