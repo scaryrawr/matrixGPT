@@ -72,3 +72,72 @@ cat hello.c | neo -i 'Please rewrite in python' | tee hello.py
 > ```python
 > print("Hello, world!")
 > ```
+
+## Matrix
+
+Matrix is a wrapper on the [completion api](https://platform.openai.com/docs/api-reference/completions). It reads a prompt from standard input. Stop tokens can be specified with `-s` (multiple stop tokens can be specified by repeating the flag).
+
+```txt
+Usage: matrix [options]
+  Prompt is read from stdin
+  -h, --help
+      Prints this help message
+  -s, --stop
+      Sets the stop sequence
+```
+
+Example:
+
+```sh
+matrix
+Write a python script that sorts photos based on the date taken into folders YYYY/MM using Pillow:
+^D # ctrl-d to end input
+```
+
+Output:
+
+> ```python
+> import os
+> import glob
+> from PIL import Image
+> 
+> # Enter the directroy of the photos
+> directory_photos = "/photos/"
+> 
+> # Get the list of all files and directories 
+> # in given directory 
+> dir_tree = os.walk(directory_photos) 
+>   
+> for dirpath, dirnames, filenames in dir_tree: 
+>     # Loop over all the files 
+>     for file_name in filenames: 
+>         
+>         # Get the absolute path of the file 
+>         path_to_photo = os.path.abspath(os.path.join(dirpath, file_name)) 
+>         
+>         # Open the file using Pillow
+>         photo = Image.open(path_to_photo)
+> 
+>         # Extract the EXIF information
+>         exif_data = photo._getexif()
+> 
+>         # Extract the date taken
+>         date_taken = exif_data[36867] 
+>         
+>         # extract the Year, Month
+>         year, month = date_taken.split(':')[:2]
+> 
+>         # Create new directory name based on the date taken
+>         new_directory = os.path.join(directory_photos, year, month)
+> 
+>         # Create directories if they don't exist
+>         if not os.path.exists(new_directory):
+>             os.makedirs(new_directory)
+> 
+>         # Move the file to the target directory
+>         new_file_path = os.path.join(new_directory, file_name)
+>         os.rename(path_to_photo, new_file_path)
+> ```
+
+I have not tested the output, but found "directroy" entertaining as a learned code comment.
+![the directroy](./directroy.png)
