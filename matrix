@@ -1,0 +1,39 @@
+#! /usr/bin/env fish
+
+function help
+    echo 'Usage: matrix [options]'
+    echo '  Prompt is read from stdin'
+    echo '  -h, --help'
+    echo '      Prints this help message'
+    echo '  -s, --stop'
+    echo '      Sets the stop sequence'
+    exit
+end
+
+argparse h/help 's/stop=+' -- $argv
+
+if test $_flag_help
+    help
+end
+
+set token (security find-generic-password -a $USER -s OpenAI -w)
+set request '{ "model": "text-davinci-003", "max_tokens": 1000, "stream": true }'
+
+read -z prompt
+set request (echo $request | jq --arg prompt "$prompt" '.prompt = $prompt')
+
+for stop in $_flag_stop
+    set request (echo $request | jq --arg stop "$stop" '.stop += [$stop]')
+end
+
+curl -s -X POST https://api.openai.com/v1/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $token" \
+    -d "$request" | string replace -r '^data: ' '' | while read -l chunk
+    if test "$chunk" = "[DONE]"
+        break
+    end
+
+    set part (echo $chunk | jq '.choices[0].text // ""')
+    echo $part | jq -j
+end
