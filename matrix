@@ -34,6 +34,5 @@ curl -s -X POST https://api.openai.com/v1/completions \
         break
     end
 
-    set part (echo $chunk | jq '.choices[0].text // ""')
-    echo $part | jq -j
+    echo $chunk | jq -j '.choices[0].text // ""'
 end
