@@ -16,7 +16,7 @@ function help
 end
 
 function clear_cache
-    rm -f $message_cache
+    rm $message_cache
     exit 0
 end
 
@@ -31,7 +31,7 @@ if test $_flag_clear
 end
 
 set token (security find-generic-password -a $USER -s OpenAI -w)
-set request '{ "model": "gpt-3.5-turbo", "messages": [] }'
+set request '{ "model": "gpt-3.5-turbo", "messages": [], "stream": true }'
 
 if test -f $message_cache
     set messages (jq -n ". = $(cat $message_cache)")
@@ -47,11 +47,20 @@ end
 
 set request (echo $request | jq ".messages += $messages")
 
-set response (curl -s -X POST https://api.openai.com/v1/chat/completions \
+set content_array '[]'
+curl -N -s -X POST https://api.openai.com/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $token" \
-    -d "$request" | jq '.choices[0].message')
+    -d "$request" | string replace -r '^data: ' '' | while read -l chunk
+    if test "$chunk" = "[DONE]"
+        break
+    end
 
+    set part (echo $chunk | jq '.choices[0].delta.content // ""')
+    echo $part | jq -j
+    set content_array (echo $content_array | jq ". += [$part]")
+end
+
+set response (echo $content_array | jq '{ "role": "assistant", "content": join("") }')
 set messages (echo $messages | jq ". += [$response]")
-echo $response | jq -r '.content'
 echo $messages | jq -c '.[-10:]' >$message_cache
