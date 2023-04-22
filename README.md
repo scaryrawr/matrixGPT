@@ -8,10 +8,6 @@ Also requires [`jq`](https://stedolan.github.io/jq/) and [`curl`](https://curl.s
 
 ## Oracle
 
-A wrapper around the [chat completion endpoint](https://platform.openai.com/docs/api-reference/chat) using `gpt-3.5-turbo`, keeps chat history in `$TMPDIR/oracle.cache`. The cache is used for submitting requests with the chat history (last 10 requests and replies).
-
-Cache is in a temporary directory, the expectation is you don't really remember what you were doing when the temporary directory is cleared anyways. I kind of wanted something tied to the current shell, but I don't know how to do that... (maybe I should have asked).
-
 ```txt
 Usage: oracle [options]
   -h, --help
@@ -24,7 +20,9 @@ Usage: oracle [options]
       Clears the message cache
 ```
 
-### Example
+A wrapper around the [chat completion endpoint](https://platform.openai.com/docs/api-reference/chat) using `gpt-3.5-turbo`, keeps chat history in `$TMPDIR/oracle.cache`. The cache is used for submitting requests with the chat history (last 10 requests and replies).
+
+Cache is in a temporary directory, the expectation is you don't really remember what you were doing when the temporary directory is cleared anyways. I kind of wanted something tied to the current shell, but I don't know how to do that... (maybe I should have asked).
 
 ```sh
 oracle -m 'Write a python script that counts from 1 to 10.'
@@ -75,8 +73,6 @@ cat hello.c | neo -i 'Please rewrite in python' | tee hello.py
 
 ## Matrix
 
-Matrix is a wrapper on the [completion api](https://platform.openai.com/docs/api-reference/completions). It reads a prompt from standard input. Stop tokens can be specified with `-s` (multiple stop tokens can be specified by repeating the flag).
-
 ```txt
 Usage: matrix [options]
   Prompt is read from stdin
@@ -86,15 +82,13 @@ Usage: matrix [options]
       Sets the stop sequence
 ```
 
-Example:
+Matrix is a wrapper on the [completion api](https://platform.openai.com/docs/api-reference/completions). It reads a prompt from standard input. Stop tokens can be specified with `-s` (multiple stop tokens can be specified by repeating the flag).
 
 ```sh
 matrix
 Write a python script that sorts photos based on the date taken into folders YYYY/MM using Pillow:
 ^D # ctrl-d to end input
 ```
-
-Output:
 
 > ```python
 > import os
