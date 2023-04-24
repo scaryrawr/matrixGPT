@@ -4,7 +4,7 @@ These are some scripts to interact with [OpenAI's APIs](https://platform.openai.
 
 These are more for my personal use and written on macos (Specifically... for getting the token, I like using secret stores). The expectation is that there's an OpenAI API key in keychain under `OpenAI` and `$USER`. Sharing incase I ever drop my laptop.
 
-Also requires [`jq`](https://stedolan.github.io/jq/) and [`curl`](https://curl.se/) to be installed and in the path. Also... expect you to have [`fish`](https://fishshell.com/) installed.
+Also requires [`jq`](https://stedolan.github.io/jq/) and [`curl`](https://curl.se/) to be installed and in the path. Also... expects you to have [`fish`](https://fishshell.com/) installed.
 
 ## Oracle
 
